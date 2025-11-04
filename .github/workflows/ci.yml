@@ -62,6 +62,7 @@ jobs:
         mkdir -p ~/.wdm
         chmod 755 ~/.wdm
         
+        echo "=== Setting up ChromeDriver permissions ==="
         python3 << 'EOF'
         from webdriver_manager.chrome import ChromeDriverManager
         import os
@@ -69,42 +70,46 @@ jobs:
         import glob
         
         # Download ChromeDriver
+        print("Downloading ChromeDriver...")
         driver_path = ChromeDriverManager().install()
-        print(f'ChromeDriver downloaded to: {driver_path}')
+        print(f'ChromeDriver path returned: {driver_path}')
         
-        # Check if the path exists and what type it is
+        # Find and fix permissions for all chromedriver executables
+        wdm_dir = os.path.expanduser('~/.wdm')
+        chromedriver_files = []
+        
+        # Search for all chromedriver files
+        for root, dirs, files in os.walk(wdm_dir):
+            for file in files:
+                if file == 'chromedriver' or (file.startswith('chromedriver') and not file.endswith('.zip')):
+                    full_path = os.path.join(root, file)
+                    chromedriver_files.append(full_path)
+        
+        print(f"Found {len(chromedriver_files)} chromedriver files:")
+        for driver_file in chromedriver_files:
+            print(f"  Processing: {driver_file}")
+            if os.path.isfile(driver_file):
+                # Set executable permissions
+                os.chmod(driver_file, 0o755)
+                # Verify permissions
+                perms = oct(os.stat(driver_file).st_mode)[-3:]
+                print(f"    Set permissions to: {perms}")
+            else:
+                print(f"    Not a file: {driver_file}")
+        
+        # Also fix permissions on the returned path
         if os.path.exists(driver_path):
             if os.path.isfile(driver_path):
-                print(f'Driver path is a file: {driver_path}')
-                current_mode = os.stat(driver_path).st_mode
-                os.chmod(driver_path, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-                new_mode = oct(os.stat(driver_path).st_mode)[-3:]
-                print(f'Set permissions to: {new_mode}')
-            elif os.path.isdir(driver_path):
-                print(f'Driver path is a directory: {driver_path}')
-                for root, dirs, files in os.walk(driver_path):
-                    for file in files:
-                        if file == 'chromedriver' or file.startswith('chromedriver'):
-                            actual_driver = os.path.join(root, file)
-                            print(f'Found chromedriver at: {actual_driver}')
-                            current_mode = os.stat(actual_driver).st_mode
-                            os.chmod(actual_driver, current_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-                            new_mode = oct(os.stat(actual_driver).st_mode)[-3:]
-                            print(f'Set permissions to: {new_mode}')
-                            break
-        else:
-            print(f'Driver path does not exist: {driver_path}')
-        
-        # List the WDM directory structure
-        wdm_files = glob.glob(os.path.expanduser('~/.wdm/**/*'), recursive=True)
-        print('WDM directory structure:')
-        for f in wdm_files:
-            if os.path.isfile(f):
-                perms = oct(os.stat(f).st_mode)[-3:]
-                print(f'  FILE: {f} (permissions: {perms})')
+                os.chmod(driver_path, 0o755)
+                perms = oct(os.stat(driver_path).st_mode)[-3:]
+                print(f"Set permissions on returned path {driver_path}: {perms}")
             else:
-                print(f'  DIR:  {f}')
+                print(f"Returned path is not a file: {driver_path}")
+        
         EOF
+        
+        echo "=== ChromeDriver files after setup ==="
+        find ~/.wdm -name "chromedriver*" -type f -exec ls -la {} \;
     
     - name: Run tests
       env:
