@@ -13,37 +13,50 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       matrix:
         browser: [chrome, firefox]
+      fail-fast: false
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: Create reports directory
+      run: mkdir -p reports/screenshots
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Install Chrome
+    - name: Install Chrome and ChromeDriver
       if: matrix.browser == 'chrome'
       run: |
+        # Install Chrome
         wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
         echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
+        
+        # Verify Chrome installation
+        google-chrome --version
     
-    - name: Install Firefox
+    - name: Install Firefox and GeckoDriver
       if: matrix.browser == 'firefox'
       run: |
         sudo apt-get update
         sudo apt-get install -y firefox
+        
+        # Verify Firefox installation
+        firefox --version
     
     - name: Run tests
       env:
@@ -55,14 +68,14 @@ jobs:
         pytest tests/ -v --html=reports/report-${{ matrix.browser }}.html --self-contained-html
     
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results-${{ matrix.browser }}
         path: reports/
     
     - name: Upload screenshots on failure
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: screenshots-${{ matrix.browser }}
