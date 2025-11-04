@@ -50,18 +50,24 @@ class WebDriverFactory:
         if headless:
             options.add_argument('--headless')
         
-        # Performance and stability options
+        # Essential options for CI and stability
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
+        
+        # Anti-detection options
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
-        options.add_argument('--window-size=1920,1080')
         
+        # Let webdriver-manager handle ChromeDriver installation and path resolution
         chrome_driver_path = ChromeDriverManager().install()
-        # Fix for incorrect path returned by ChromeDriverManager on macOS
+        
+        # Simple fix for macOS path issue
         if chrome_driver_path.endswith('THIRD_PARTY_NOTICES.chromedriver'):
             chrome_driver_path = chrome_driver_path.replace('THIRD_PARTY_NOTICES.chromedriver', 'chromedriver')
+        
         service = ChromeService(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=options)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
