@@ -1,0 +1,10 @@
+selenium==4.16.0
+pytest==7.4.3
+pytest-bdd==7.0.1
+pytest-html==4.1.1
+allure-pytest==2.13.2
+webdriver-manager==4.0.1
+pytest-xdist==3.5.0
+configparser==6.0.0
+faker==20.1.0
+requests==2.31.0
