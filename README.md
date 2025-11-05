@@ -1,6 +1,6 @@
 # Selenium BDD WebShop Automation
 
-![Test Status](https://github.com/jingbinw/selenium-bdd-webshop/workflows/Selenium%20BDD%20Test%20Suite/badge.svg)
+![Test Status](https://github.com/jingbinw/selenium-bdd-webshop/workflows/Selenium%20BDD%20Tests/badge.svg)
 ![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)
 ![Selenium](https://img.shields.io/badge/selenium-4.16.0-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
