@@ -10,6 +10,9 @@ A comprehensive Selenium automation testing project using Python, Page Object pa
 ## Demo
 ![Demo animation](demo.gif)
 
+## Report
+![HTML Report](html_report.png)
+
 ## Features
 
 - **Selenium WebDriver 4.x** with multi-browser support (Chrome, Firefox, Edge)
