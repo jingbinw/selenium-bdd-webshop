@@ -5,6 +5,8 @@
 ![Selenium](https://img.shields.io/badge/selenium-4.16.0-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
+⬇️ **[Download Latest Release](https://github.com/jingbinw/selenium-bdd-webshop/releases/latest)** | 📋 **[View All Releases](https://github.com/jingbinw/selenium-bdd-webshop/releases)**
+
 A comprehensive Selenium automation testing project using Python, Page Object pattern, BDD (Behavior Driven Development), and Allure reporting. Automates testing for [Demo Web Shop](https://demowebshop.tricentis.com/).
 
 ## Demo
