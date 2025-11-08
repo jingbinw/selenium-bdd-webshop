@@ -7,6 +7,9 @@
 
 A comprehensive Selenium automation testing project using Python, Page Object pattern, BDD (Behavior Driven Development), and Allure reporting. Automates testing for [Demo Web Shop](https://demowebshop.tricentis.com/).
 
+## Demo
+![Demo animation](demo.gif)
+
 ## Features
 
 - **Selenium WebDriver 4.x** with multi-browser support (Chrome, Firefox, Edge)
