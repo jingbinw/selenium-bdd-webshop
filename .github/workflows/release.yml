@@ -38,6 +38,60 @@ jobs:
         export DISPLAY=:99
         Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
     
+    - name: Setup WebDriver cache and permissions
+      run: |
+        mkdir -p ~/.wdm
+        chmod 755 ~/.wdm
+        
+        echo "=== Setting up ChromeDriver permissions ==="
+        python3 << 'EOF'
+        from webdriver_manager.chrome import ChromeDriverManager
+        import os
+        import stat
+        import glob
+        
+        # Download ChromeDriver
+        print("Downloading ChromeDriver...")
+        driver_path = ChromeDriverManager().install()
+        print(f'ChromeDriver path returned: {driver_path}')
+        
+        # Find and fix permissions for all chromedriver executables
+        wdm_dir = os.path.expanduser('~/.wdm')
+        chromedriver_files = []
+        
+        # Search for all chromedriver files
+        for root, dirs, files in os.walk(wdm_dir):
+            for file in files:
+                if file == 'chromedriver' or (file.startswith('chromedriver') and not file.endswith('.zip')):
+                    full_path = os.path.join(root, file)
+                    chromedriver_files.append(full_path)
+        
+        print(f"Found {len(chromedriver_files)} chromedriver files:")
+        for driver_file in chromedriver_files:
+            print(f"  Processing: {driver_file}")
+            if os.path.isfile(driver_file):
+                # Set executable permissions
+                os.chmod(driver_file, 0o755)
+                # Verify permissions
+                perms = oct(os.stat(driver_file).st_mode)[-3:]
+                print(f"    Set permissions to: {perms}")
+            else:
+                print(f"    Not a file: {driver_file}")
+        
+        # Also fix permissions on the returned path
+        if os.path.exists(driver_path):
+            if os.path.isfile(driver_path):
+                os.chmod(driver_path, 0o755)
+                perms = oct(os.stat(driver_path).st_mode)[-3:]
+                print(f"Set permissions on returned path {driver_path}: {perms}")
+            else:
+                print(f"Returned path is not a file: {driver_path}")
+        
+        EOF
+        
+        echo "=== ChromeDriver files after setup ==="
+        find ~/.wdm -name "chromedriver*" -type f -exec ls -la {} \;
+
     - name: Run tests
       env:
         BROWSER: chrome
