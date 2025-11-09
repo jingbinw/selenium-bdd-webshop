@@ -36,6 +36,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Install Allure Commandline
+      uses: actions/setup-allure@v1.4.0
+      with:
+        allure-version: '2.21.0'
     
     - name: Install Chrome
       if: matrix.browser == 'chrome'
@@ -129,15 +134,28 @@ jobs:
         ls -la ~/.wdm/ || echo "No cache directory found"
         
         # Run tests with verbose output
-        pytest tests/ -v -s --html=reports/report-${{ matrix.browser }}.html --self-contained-html
+        pytest tests/ -v -s --html=reports/html-report-${{ matrix.browser }}.html --self-contained-html \
+          --alluredir=reports/allure-results-${{ matrix.browser }}
+
+    - name: Generate Allure report    
+      run: |
+        allure generate reports/allure-results-${{ matrix.browser }} \
+          -o reports/allure-report-${{ matrix.browser }} --clean  
     
-    - name: Upload test results
+    - name: Upload pytest HTML report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.browser }}
-        path: reports/
-    
+        name: html-report-${{ matrix.browser }}
+        path: reports/html-report-${{ matrix.browser }}.html
+
+    - name: Upload Allure report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-${{ matrix.browser }}
+        path: reports/allure-report-${{ matrix.browser }}/
+
     - name: Upload screenshots on failure
       uses: actions/upload-artifact@v4
       if: failure()
