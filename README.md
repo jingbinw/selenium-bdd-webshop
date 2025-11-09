@@ -10,10 +10,15 @@
 A comprehensive Selenium automation testing project using Python, Page Object pattern, BDD (Behavior Driven Development), and Allure reporting. Automates testing for [Demo Web Shop](https://demowebshop.tricentis.com/).
 
 ## Demo
-![Demo animation](demo.gif)
+![Demo animation](images/demo.gif)
 
-## Report
-![HTML Report](html_report.png)
+## Allure Reports
+![Allure Overview](images/allure_overview.png)
+![Allure Graphs](images/allure_graphs.png)
+![Allure Behaviors](images/allure_behaviors.png)
+
+## HTML Report
+![HTML Report](images/html_report.png)
 
 ## Features
 
