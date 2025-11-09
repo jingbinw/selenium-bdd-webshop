@@ -38,9 +38,16 @@ jobs:
         pip install -r requirements.txt
 
     - name: Install Allure Commandline
-      uses: actions/setup-allure@v1.4.0
-      with:
-        allure-version: '2.21.0'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip
+        # Download the desired version (example 2.21.0)
+        sudo mkdir -p /opt/allure
+        curl -Lo allure-2.21.0.zip https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+        unzip allure-2.21.0.zip -d /opt/allure
+        rm allure-2.21.0.zip
+        sudo ln -s /opt/allure/allure-2.21.0/bin/allure /usr/local/bin/allure
+        allure --version
     
     - name: Install Chrome
       if: matrix.browser == 'chrome'
