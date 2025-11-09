@@ -36,6 +36,18 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+
+    - name: Install Allure Commandline
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip
+        # Download the desired version (example 2.21.0)
+        sudo mkdir -p /opt/allure
+        curl -Lo allure-2.21.0.zip https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.zip
+        unzip allure-2.21.0.zip -d /opt/allure
+        rm allure-2.21.0.zip
+        sudo ln -s /opt/allure/allure-2.21.0/bin/allure /usr/local/bin/allure
+        allure --version
     
     - name: Install Chrome
       if: matrix.browser == 'chrome'
@@ -129,15 +141,28 @@ jobs:
         ls -la ~/.wdm/ || echo "No cache directory found"
         
         # Run tests with verbose output
-        pytest tests/ -v -s --html=reports/report-${{ matrix.browser }}.html --self-contained-html
+        pytest tests/ -v -s --html=reports/html-report-${{ matrix.browser }}.html --self-contained-html \
+          --alluredir=reports/allure-results-${{ matrix.browser }}
+
+    - name: Generate Allure report    
+      run: |
+        allure generate reports/allure-results-${{ matrix.browser }} \
+          -o reports/allure-report-${{ matrix.browser }} --clean  
     
-    - name: Upload test results
+    - name: Upload pytest HTML report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results-${{ matrix.browser }}
-        path: reports/
-    
+        name: html-report-${{ matrix.browser }}
+        path: reports/html-report-${{ matrix.browser }}.html
+
+    - name: Upload Allure report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: allure-report-${{ matrix.browser }}
+        path: reports/allure-report-${{ matrix.browser }}/
+
     - name: Upload screenshots on failure
       uses: actions/upload-artifact@v4
       if: failure()
